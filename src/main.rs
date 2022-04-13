@@ -1,40 +1,24 @@
 //send email messages from the command line
 //cargo run -- address option
+use cli_email::Default;
 use std::env;
-use std::io;
-use std::process::Command; // runs os commands
-
-#[allow(dead_code)]
-#[derive(Debug)]
-struct Draft<T> {
-    address: T,
-    subject: T,
-    message: T,
-}
+//use std::process::Command; // runs os commands
+use cli_email::Draft;
 
 fn main() {
-    let options: Vec<String> = env::args().collect();
+    let input: Vec<String> = env::args().collect();
 
-    let email = &options[1];
-    let flags = &options[2];
+    let mut draft = Draft::default();
+    draft.sender = &input[1];
+    draft.reciever = &input[2];
+    let option = &input[3];
 
-    println!("email = {}, flag = {}", email, flags);
+    cli_email::set_flag(option, &draft);
+}
 
-
-   Command::new("cmd")
+/*************
+Command::new("cmd")
         .args(["/C" , "npm"])
         .spawn()
         .expect("ls command failed to start");
-}
-
-fn _validate_email(){}
-
-fn _read_line() -> String{
-    let mut line = String::new();
-
-    io::stdin()
-        .read_line(&mut line)
-        .expect("Couldn't read line!!");
-
-    line
-}
+***********/
