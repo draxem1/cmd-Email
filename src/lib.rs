@@ -1,8 +1,8 @@
 /**************************/
-use std::process::Command;
-use std::io;
-use std::thread;
-use std::time::Duration;
+#[path = "./dependents/text_editing.rs"]
+mod text_editing;
+
+use crate::text_editing::text::{back_a_line, clear_screen, read_line};
 
 #[derive(Debug)]
 #[allow(dead_code)]
@@ -81,84 +81,59 @@ pub fn set_flag<'a, U>(run: &str, email: &U)
 		}
 }
 
-//Can be a caller func in another file
-pub fn read_line() -> String{
-    let mut line = String::new();
-
-    io::stdin()
-        .read_line(&mut line)
-        .expect("Couldn't read line!!");
-
-    line
-}
-
 
 //Refactor into another file
 //needs seperate func with editing options of message body
 pub fn new_draft(sender: &str, reciever: &str){
+
 	let call = || -> String{
 		read_line()
 	};
+
 	let draft = Draft::default();
-	clear_screen();
-
-	println!("Subject: ");
-	let sub = String::from(call());
-	let body = edited_message(call);
-	let draft = draft.new(sender, reciever, &sub, &body);
-
-	println!("\n\n{:?}", draft);
-}
-
-/*******************************
- * --CL: erase "message"
- * --D: Done
- * 
- * **************************/
- #[allow(unused_variables)]
-pub fn edited_message<F>(call: F) -> String
-	where F: Fn() -> String{
+	let mut sub = String::new();
+	let mut count = 0;
+	let mut cnt2 = 0;
 	let mut body = String::new();
 
-	println!("\nMESSAGE:");
+	loop {
+		clear_screen();
+		println!("Subject:");
 
-	while !body.contains("--D") {
-		if body.contains("--CL") {
-            body.clear();
-
+		if count == 0 {
+			sub = call();
+			count += 1;
 		} else {
-			body.push_str(&call());
+			print!("{}", &sub);
+		}
+		println!("\nMessage:");
+
+		if cnt2 > 0 {
+			print!("{}", &body);
+		}
+		while !body.contains("--D") {
+
+			if body.contains("--CL") {
+				body.clear();
+				break;
+			}
+			else if body.contains("--B") {
+				cnt2 += 1;
+				let tmp = back_a_line(&body);
+				body.clear();
+				body.push_str(&tmp);
+				break;
+
+			} else {
+				body.push_str(&call());
+			}
+		}
+
+		if body.contains("--D") {
+			break;
 		}
 	}
-	body.trim().to_string()
-}
 
-/*****
-pub fn back_a_line(message: &str) -> String{
-	let s = String::from(message);
-	let mut m: Vec<&str> = s.split("\r").collect();
-	let mut string = String::new();
-
-	m.pop();
-
-	for i in m {
-		string.push_str(i);
-	}
-
-	string
-}
-****/
-
-//Used threads to give next print macro time
-pub fn clear_screen(){
-	let handle = thread::spawn(|| {
-		Command::new("cmd")
-			.args(["/C","cls"])
-			.spawn()
-			.expect("Couldn't clear!!");
-		thread::sleep(Duration::from_millis(1));
-	});
-
-	handle.join().unwrap();
-	thread::sleep(Duration::from_millis(1));
+	let draft = draft.new(sender, reciever, &sub, &body.trim());
+	println!("\n\n{:?}", draft);
 }
