@@ -42,12 +42,29 @@ use std::time::Duration;
 	    line
 	}
 
-pub fn help_menu() {
+pub fn help_menu(x: u32) {
+
+match x{
+		1 => {
 let raw = 
 r#"*******************************************
-* Options -> "$F" = final, "$CL" = clear,    *
+* Options -> "$F" = final, "$CL" = clear, *
 *******************************************"#;
-println!("{}\n\n",raw);
+		println!("{}\n\n",raw);
+	},
+		2 => {
+let raw = 
+r#"*********************************************
+* Options :         "-n" = new draft,       *
+*                   "-r" = get saved draft  *
+*                   "-l" = contact list     *
+*                   "-h" = help menu        *
+*                                           *
+* Example: you@..com  -l  to@..com          * 
+*********************************************"#;
+		println!("{}\n\n",raw);
+	},
+	_ => (),
 }
 
-}
+}}

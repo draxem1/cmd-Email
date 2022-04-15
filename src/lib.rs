@@ -2,9 +2,14 @@
 #[path = "./dependents/text_editing.rs"]
 mod text_editing;
 
-use crate::text_editing::text::*;
+#[path = "./dependents/database.rs"]
+mod database;
 
-#[derive(Debug)]
+use serde::{Serialize, Deserialize};
+pub use crate::text_editing::text::*;
+pub use database::data::*;
+
+#[derive(Debug, Deserialize, Serialize)]
 #[allow(dead_code)]
 pub struct Draft<T>{
 	pub sender: T,
@@ -81,7 +86,7 @@ impl <T>Edit for Draft<T>{
 
 		let subject = || -> String{
 			clear_screen();
-			help_menu();
+			help_menu(1);
 
 			println!("Subject:");
 			let string = read_line();
@@ -93,7 +98,7 @@ impl <T>Edit for Draft<T>{
 
 			'outer: loop {
 				clear_screen();
-				help_menu();
+				help_menu(1);
 				println!("Message:");
 
 					print!("{}",&string);
@@ -118,6 +123,7 @@ impl <T>Edit for Draft<T>{
 }
 
 //Because T become &str lifetime parameter takes place of T
+//Decision tree from input
 pub fn set_flag<'a, U>(run: &str, email: &U)
 	where U: Getter<&'a str>{
 		match run {
@@ -132,6 +138,7 @@ pub fn set_flag<'a, U>(run: &str, email: &U)
 				println!("{:?}", new);
 			},
 			//"-r" => retrieve_saved_draft(),
+			"-h" => help_menu(2),
 				_=> (),
 		}
 }
