@@ -4,21 +4,18 @@ use std::io;
 use std::thread;
 use std::time::Duration;
 
-	pub fn back_a_line(message: &str) -> String{
-		let mut chunks: Vec<&str> = message.split("\r").collect();
-		let mut string = String::new();
+	pub enum Options<'a> {
+		Done(&'a str),
+		Clear(&'a str),
+	}
 
-		chunks.pop();
-
-		for i in chunks {
-			let tmp = format!("\r{}", i);
-			string.push_str(&tmp);
+	impl <'a>Options<'a> {
+		pub fn choice(&'a self) -> &'a str{
+			match self {
+				Options::Done(n) => n,
+				Options::Clear(n) => n, 
+			}
 		}
-
-		//println! here to give time for other print macros
-		//after clear_screen is called
-		println!("");
-		string
 	}
 
 	//Used threads to give next print macro time
@@ -44,5 +41,13 @@ use std::time::Duration;
 
 	    line
 	}
+
+pub fn help_menu() {
+let raw = 
+r#"*******************************************
+* Options -> "$F" = final, "$CL" = clear,    *
+*******************************************"#;
+println!("{}\n\n",raw);
+}
 
 }

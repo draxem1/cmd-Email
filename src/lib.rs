@@ -2,7 +2,7 @@
 #[path = "./dependents/text_editing.rs"]
 mod text_editing;
 
-use crate::text_editing::text::{back_a_line, clear_screen, read_line};
+use crate::text_editing::text::*;
 
 #[derive(Debug)]
 #[allow(dead_code)]
@@ -24,6 +24,10 @@ pub trait New{
 				_: Self::Input,
 				_: Self::Input, 
 				_: Self::Input) -> Self;
+}
+
+pub trait Edit {
+	fn edit(&self) -> (String, String);
 }
 
 pub trait Getter<T> {
@@ -70,70 +74,64 @@ impl <T>New for Draft<T> {
 	}
 }
 
+impl <T>Edit for Draft<T>{
+	fn edit(&self) -> (String, String){
+		let done = Options::Done("$F");
+		let erase = Options::Clear("$CL");
+
+		let subject = || -> String{
+			clear_screen();
+			help_menu();
+
+			println!("Subject:");
+			let string = read_line();
+			string
+		};
+
+		let message = || -> String{
+			let mut string = String::new();
+
+			'outer: loop {
+				clear_screen();
+				help_menu();
+				println!("Message:");
+
+					print!("{}",&string);
+
+				'inner: loop {
+					if string.contains(done.choice()) {
+						break 'outer string;
+
+					} else if string.contains(erase.choice()) {
+						string.clear();
+						break 'inner;
+
+					} else {
+						string.push_str(&read_line());
+					}
+				}
+			}
+		};
+
+		(subject(),message())
+	}
+}
+
 //Because T become &str lifetime parameter takes place of T
-//Refactor into another file
 pub fn set_flag<'a, U>(run: &str, email: &U)
 	where U: Getter<&'a str>{
 		match run {
-			"-n" => new_draft(&email.get_sender(), &email.get_reciever()),
+			"-n" => { let draft = Draft::default();
+				let tuple = draft.edit(); 
+				let new = draft.new(
+					email.get_sender(),
+					email.get_reciever(),
+					&tuple.0,
+					&tuple.1,
+				); 
+				println!("{:?}", new);
+			},
 			//"-r" => retrieve_saved_draft(),
 				_=> (),
 		}
-}
-
-
-//Refactor into another file
-//needs seperate func with editing options of message body
-pub fn new_draft(sender: &str, reciever: &str){
-
-	let call = || -> String{
-		read_line()
-	};
-
-	let draft = Draft::default();
-	let mut sub = String::new();
-	let mut count = 0;
-	let mut cnt2 = 0;
-	let mut body = String::new();
-
-	loop {
-		clear_screen();
-		println!("Subject:");
-
-		if count == 0 {
-			sub = call();
-			count += 1;
-		} else {
-			print!("{}", &sub);
-		}
-		println!("\nMessage:");
-
-		if cnt2 > 0 {
-			print!("{}", &body);
-		}
-		while !body.contains("--D") {
-
-			if body.contains("--CL") {
-				body.clear();
-				break;
-			}
-			else if body.contains("--B") {
-				cnt2 += 1;
-				let tmp = back_a_line(&body);
-				body.clear();
-				body.push_str(&tmp);
-				break;
-
-			} else {
-				body.push_str(&call());
-			}
-		}
-
-		if body.contains("--D") {
-			break;
-		}
-	}
-
-	let draft = draft.new(sender, reciever, &sub, &body.trim());
-	println!("\n\n{:?}", draft);
 }
