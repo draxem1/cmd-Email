@@ -137,7 +137,7 @@ pub fn set_flag<'a, U>(run: &str, email: &U)
 				); 
 				println!("{:?}", new);
 			},
-			//"-r" => retrieve_saved_draft(),
+			"-l" => contact_list(),
 			"-h" => help_menu(2),
 				_=> (),
 		}
