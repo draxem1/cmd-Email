@@ -59,8 +59,7 @@ r#"*********************************************
 *                   "-r" = get saved draft  *
 *                   "-l" = contact list     *
 *                   "-h" = help menu        *
-*                                           *
-* Example: you@..com  -l  to@..com          * 
+*                   "-ul" = new contact     * 
 *********************************************"#;
 		println!("{}\n\n",raw);
 	},
