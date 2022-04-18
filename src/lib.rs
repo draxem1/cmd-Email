@@ -138,7 +138,10 @@ pub fn set_flag<'a, U>(run: &str, email: &U)
 				println!("{:?}", new);
 			},
 			"-l" => contact_list(),
+			"-ul" => new_contact(),
+			"-rc" => remove_contact(),
 			"-h" => help_menu(2),
-				_=> (),
+				_=> {println!("Not a valid option");
+					help_menu(2);},
 		}
 }
