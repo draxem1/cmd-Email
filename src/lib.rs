@@ -5,9 +5,13 @@ mod text_editing;
 #[path = "./dependents/database.rs"]
 mod database;
 
+#[path = "./dependents/email.rs"]
+mod email;
+
 use serde::{Serialize, Deserialize};
 pub use crate::text_editing::text::*;
 pub use database::data::*;
+use email::sender::*;
 
 #[derive(Debug, Deserialize, Serialize)]
 #[allow(dead_code)]
@@ -132,10 +136,10 @@ pub fn set_flag<'a, U>(run: &str, email: &U)
 				let new = draft.new(
 					email.get_sender(),
 					email.get_reciever(),
-					&tuple.0,
-					&tuple.1,
+					&tuple.0.trim(),
+					&tuple.1.trim(),
 				); 
-				println!("{:?}", new);
+				new.full_send();
 			},
 			"-l" => contact_list(),
 			"-ul" => new_contact(),
