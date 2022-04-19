@@ -54,12 +54,12 @@ r#"*******************************************
 	},
 		2 => {
 let raw = 
-r#"*********************************************
-* Options :         "-n" = new draft,       *
-*                   "-r" = get saved draft  *
-*                   "-l" = contact list     *
-*                   "-h" = help menu        *
-*                   "-ul" = new contact     * 
+r#"********************************************* EXAMPLES
+* Options :         "-n" = new draft,           "your_email@gmail.com" -n "sent_to@some.com"
+*                   "-r" = get saved draft       your_email -r sent_to email
+*                   "-l" = contact list          anything   -l
+*                   "-h" = help menu             anything   -h
+*                   "-ul" = new contact          anything   -ul       
 *********************************************"#;
 		println!("{}\n\n",raw);
 	},
